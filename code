@@ -1,0 +1,70 @@
+import java.util.*;
+
+class Solution {
+    private boolean[][] vis;
+    private int count;
+    private int[][] ref;
+    public int solve(int[][] matrix) {
+        int id = 2;
+        int ret = 1;
+        ref = new int[matrix.length][matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if (matrix[i][j] == 1) {
+                    count = 0;
+                    //filling for id
+                    vis = new boolean[matrix.length][matrix[0].length];
+                    floodfill(matrix, i, j, 1, id, true);
+                    
+                    ret = Math.max(ret, count);
+                    //filling for size
+                    vis = new boolean[matrix.length][matrix[0].length];
+                    floodfill(matrix, i, j, id, count, false);
+                    id++;
+                }
+            }
+        }
+        System.out.println(Arrays.deepToString(matrix));
+        
+        
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if (matrix[i][j] == 0) {
+                    Set<Integer> dups = new HashSet();
+                    int challenge = 1;
+                    if (i != 0 && !dups.contains(ref[i-1][j])) {
+                        challenge += matrix[i-1][j];
+                        dups.add(ref[i-1][j]);
+                    }
+                    if (i != matrix.length-1 && !dups.contains(ref[i+1][j])) {
+                        challenge += matrix[i+1][j];
+                        dups.add(ref[i+1][j]);
+                    }
+                    if (j != 0 && !dups.contains(ref[i][j-1])) {
+                        challenge += matrix[i][j-1];
+                        dups.add(ref[i][j-1]);
+                    }
+                    if (j != matrix[0].length-1 && !dups.contains(ref[i][j+1])) {
+                        challenge += matrix[i][j+1];
+                        dups.add(ref[i][j+1]);
+                    }
+                    ret = Math.max(ret, challenge);
+                }
+            }
+        }
+        return ret;
+    }
+    public void floodfill(int[][] matrix, int i, int j, int check, int change, boolean is_initial) {
+        if (i == -1 || j == -1 || i == matrix.length || j == matrix[0].length || matrix[i][j] != check || vis[i][j]) {
+            return;
+        }
+        if (is_initial) ref[i][j] = change;
+        count++;
+        vis[i][j] = true;
+        matrix[i][j] = change;
+        floodfill(matrix, i+1, j, check, change, is_initial);
+        floodfill(matrix, i-1, j, check, change, is_initial);
+        floodfill(matrix, i, j+1, check, change, is_initial);
+        floodfill(matrix, i, j-1, check, change, is_initial);
+    }
+}
